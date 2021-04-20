@@ -1,0 +1,20 @@
+- name: Run Microsoft .NET Framework 4.8
+  win_shell: cmd /c "$env:appinstall\Microsoft .NET Framework 4.8\Install-NetFramework.CMD"
+
+#  - name: Run Visual C++ 2013 Redistributable x86
+#    win_shell: cmd /c "$env:appinstall\Microsoft Visual C++ 2013 Redistributable x86\Install-VisualCRedist.CMD"
+
+#  - name: Run Visual C++ 2013 Redistributable x64    
+#    win_shell: cmd /c "$env:appinstall\Microsoft Visual C++ 2013 Redistributable x64\Install-VisualCRedist.CMD"
+
+#  - name: Run Visual C++ 2015 Redistributable x86
+#    win_shell: cmd /c "$env:appinstall\Microsoft Visual C++ 2015 Redistributable x86\Install-VisualCRedist.CMD"
+
+#  - name: Run Visual C++ 2015 Redistributable x64    
+#    win_shell: cmd /c "$env:appinstall\Microsoft Visual C++ 2015 Redistributable x64\Install-VisualCRedist.CMD"    
+  
+- name: Run Visual C++ 2017 Redistributable x64
+  win_shell: cmd /c "$env:appinstall\Microsoft Visual C++ 2017 Redistributable x64\Install-VisualCRedist.CMD"    
+
+- name: Run Visual C++ 2017 Redistributable x86    
+  win_shell: cmd /c "$env:appinstall\Microsoft Visual C++ 2017 Redistributable x86\Install-VisualCRedist.CMD"  

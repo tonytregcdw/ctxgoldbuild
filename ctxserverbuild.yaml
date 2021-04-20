@@ -1,0 +1,142 @@
+- hosts: ctxinfra
+  gather_facts: false
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: "{{ adds_admin_user }}"
+    ansible_become_password: "{{ adds_admin_pass }}"
+    ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only    
+    
+  tasks:
+
+  - name: Set an environment variable for app installation path
+    win_environment:
+      state: present
+      name: appinstall
+      value: "{{ appinstall_path }}"
+      level: machine
+
+  - name: join AD DS domain
+    win_domain_membership:
+      dns_domain_name: "{{ adds_fqdn }}"
+      domain_admin_user: "{{ adds_admin_user }}"
+      domain_admin_password: "{{ adds_admin_pass }}"
+      domain_ou_path: "{{ adds_ou_path }}"
+      state: domain
+    register: domain_state
+
+  - win_reboot:
+    when: domain_state.reboot_required
+   
+  - name: install admin tools
+    win_feature:
+      name: RSAT-Role-Tools
+      state: present
+
+  - name: install gpmc
+    win_feature:
+      name: GPMC
+      state: present
+
+  - name: install net framework core
+    win_feature:
+      name: NET-Framework-45-Core
+      state: present
+
+  - name: Windows Process Activation Service (WAS)
+    win_feature:
+      name: WAS
+      state: present
+
+  - name: install chocolately
+    win_shell: iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    args:
+      creates: C:\ProgramData\chocolatey\bin\choco.exe
+      
+  - name: Reboot post dependency installations
+    win_reboot:
+
+    
+# Install hosting platform tools
+
+#  - name: Install VMware Tools
+#    win_shell: cmd /c "$env:appinstall\VMware Tools 10.\Install-VMwareTools-x64.CMD"
+
+# OS Customisation
+      
+#  - name: reg key example
+#    win_regedit:
+#      path: HKLM:\Software\TTLAB
+#      name: hello
+#      data: world
+      
+#  - name: dword reg key example
+#    win_regedit:
+#      path: HKLM:\Software\TTLAB
+#      name: hellod
+#      data: 1
+#      type: dword
+
+#  - name: Run a multiple powershell commands
+#    win_shell: |
+#      New-Item -Path C:\temp -ItemType Directory
+#      New-Item -Path C:\temp\ansible -ItemType Directory
+#      write-host hello-mate >> c:\temp\ansible\test.txt
+
+#  - name: Run a command under cmd
+#    win_shell: echo ansible test >> C:\temp\test.txt && echo still here >> c:\temp\test.txt
+#    args:
+#      executable: cmd.exe
+
+   
+# Install applications
+
+  - name: Install notepad-plus-plus
+    win_package:
+      path: https://notepad-plus-plus.org/repository/7.x/7.0/npp.7.Installer.x64.exe
+      product_id: Notepad++
+      arguments: /S
+      state: present
+
+- hosts: ctxsf
+  gather_facts: false
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: "{{ adds_admin_user }}"
+    ansible_become_password: "{{ adds_admin_pass }}"
+    ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only    
+      
+  tasks: 
+# Install Citrix Storefront
+
+  - name: install IIS
+    win_feature:
+      name: Web-Default-Doc,Web-Http-Errors,Web-Static-Content,Web-Http-Redirect,Web-Http-Logging,Web-Filtering,Web-Basic-Auth,Web-Windows-Auth,Web-Net-Ext45,Web-AppInit,Web-Asp-Net45,Web-ISAPI-Ext,Web-ISAPI-Filter,Web-Mgmt-Console,Web-Scripting-Tools,NET-Framework-45-ASPNET
+      state: present
+
+  - name: Reboot IIS install reboot
+    win_reboot:
+           
+  - name: Install Citrix storefront
+    win_shell: cmd /c "$env:appinstall\Citrix XenDesktop 1912 LTSR\x64\Storefront\CitrixStoreFront-x64.exe" -silent
+    args:
+      creates: C:\Program Files\Citrix\Receiver StoreFront\Management\CitrixStoreFrontConsole.msc
+
+- hosts: ctxddc
+  gather_facts: false
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: "{{ adds_admin_user }}"
+    ansible_become_password: "{{ adds_admin_pass }}"
+    ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only    
+      
+  tasks:
+# Install Citrix DDC
+
+  - name: Install Citrix DDC
+    win_shell: cmd /c "$env:appinstall\Citrix XenDesktop 1912 LTSR\x64\XenDesktop Setup\XenDesktopServerSetup.exe" /components controller,desktopstudio /configure_firewall /nosql /noreboot /quiet
+    args:
+      creates: C:\Program Files (x86)\Citrix\ICA Client\wfcrun32.exe
+

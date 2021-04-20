@@ -1,0 +1,21 @@
+---
+ctxws2019:
+  children:
+      ctxapp:
+          hosts:
+            ctxapp01:
+              ansible_host: 51.11.7.131
+      ctxinfra:
+        children:
+          ctxsf:
+              hosts:
+                ctxsf01:
+                  ansible_host: 51.11.7.131
+#          ctxddc:
+#              hosts:
+#                ctxddc01:
+#                  ansible_host: 51.11.7.132         
+ctxadc:
+  hosts:
+    ctxadc01:
+      ansible_host: 192.168.24.80

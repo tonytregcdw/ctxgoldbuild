@@ -1,0 +1,16 @@
+---
+local_admin_user: labadmin
+local_admin_pass: TWwhdO_uX9m56FS52j%Z
+adds_admin_user: ttwinrm@ttlab.local 
+adds_admin_pass: Ansiblem@nage
+vsphere_admin_user: twinrm@ttlab.local 
+vsphere_admin_pass: Ansiblem@nage
+adds_fqdn: ttlab.local
+adds_ou_path: "OU=SessionHosts,OU=Citrix,OU=Infra,DC=ttlab,DC=local"
+appinstall_path: \\WS2019ADDS01\applications
+ansible_connection: winrm
+ansible_winrm_server_cert_validation: ignore
+ansible_user: "{{ local_admin_user }}"
+ansible_password: "{{ local_admin_pass }}"
+ansible_become_user: "{{ adds_admin_user }}"
+ansible_become_password: "{{ adds_admin_pass }}"

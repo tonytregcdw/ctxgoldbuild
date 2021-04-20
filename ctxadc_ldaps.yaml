@@ -1,0 +1,71 @@
+# module ref: https://github.com/citrix/citrix-adc-ansible-modules
+# Creates an ldaps load balanced configuration including custom monitor.
+
+- hosts: ctxadc
+  gather_facts: false
+
+  collections:
+    - citrix.adc
+
+# ldaps service
+  tasks:
+    - name: setup ldaps monitor
+      delegate_to: localhost
+      citrix_adc_lb_monitor:
+        nsip: "{{ ansible_host }}"
+        nitro_user: "{{ nitro_user }}"
+        nitro_pass: "{{ nitro_pass }}"
+        validate_certs: no
+        state: present
+        monitorname: mon_ldaps
+        type: LDAP
+        basedn: "{{ ldaps_basedn }}"
+        binddn: "{{ ldaps_binddn }}"
+        password: "{{ ldaps_bindpass }}"
+        secure: yes
+    
+    - name: Setup ldaps service group
+      delegate_to: localhost
+      citrix_adc_servicegroup:
+        nsip: "{{ ansible_host }}"
+        nitro_user: "{{ nitro_user }}"
+        nitro_pass: "{{ nitro_pass }}"
+        validate_certs: no
+
+        state: present
+
+        servicegroupname: svcgrp_ldaps_636_ansible
+        servicetype: TCP
+        servicemembers:
+            mode: exact
+            attributes:
+              - ip: "{{ ldap_svc1_ip }}"
+                port: 636
+
+        monitor_bindings:
+            mode: exact
+            attributes:
+              - monitor_name: mon_ldaps
+
+    # Citrix ADC ldaps service
+
+    - name: Create vserver
+      delegate_to: localhost
+      citrix_adc_lb_vserver:
+        nsip: "{{ ansible_host }}"
+        nitro_user: "{{ nitro_user }}"
+        nitro_pass: "{{ nitro_pass }}"
+        validate_certs: no
+
+        state: present
+
+        name: vsrv_ldaps_636_ansible
+        servicetype: TCP
+        timeout: 12
+        ipv46: "{{ ldapvs_ip }}"
+        port: 636
+        servicegroupbindings:
+            - servicegroupname: svcgrp_ldaps_636_ansible
+
+    - name: creat vserver via SSH
+      command: add vpn vserver rdp1.trickyjoe.com SSL 192.168.24.92 443 -Listenpolicy NONE -authnProfile authprof_aaa_ldaps_RDP

@@ -1,0 +1,115 @@
+- hosts: ctxapp
+  gather_facts: false
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: "{{ adds_admin_user }}"
+    ansible_become_password: "{{ adds_admin_pass }}"
+    ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only    
+    
+  tasks:
+
+  - name: Set an environment variable for app installation path
+    win_environment:
+      state: present
+      name: appinstall
+      value: "{{ appinstall_path }}"
+      level: machine
+
+  - name: join AD DS domain
+    win_domain_membership:
+      dns_domain_name: "{{ adds_fqdn }}"
+      domain_admin_user: "{{ adds_admin_user }}"
+      domain_admin_password: "{{ adds_admin_pass }}"
+      domain_ou_path: "{{ adds_ou_path }}"
+      state: domain
+    register: domain_state
+
+  - win_reboot:
+    when: domain_state.reboot_required
+
+  - name: Enable RDS win feature  
+    win_feature:
+      name: RDS-RD-Server
+      state: present
+      include_management_tools: False
+
+  - name: reboot pre-dependency installations
+    win_reboot:
+      
+#  - name: map a drive to application installation source
+#    win_mapped_drive:
+#      letter: M
+#      path: "{{ appinstall_path }}"
+
+
+# Install runtimes and dependencies
+    
+  - name: Include runtime and dependencies playbook
+    include: runtimes.yaml
+
+
+  - name: Reboot post dependency installations
+    win_reboot:
+
+    
+# Install hosting platform tools
+
+#  - name: Install VMware Tools
+#    win_shell: cmd /c "$env:appinstall\VMware Tools 10.x\Install-VMwareTools-x64.CMD"
+
+#  - name: Install Nutanix guest Tools
+#    win_shell: cmd /c "$env:appinstall\Nutanix Guest Tools\Install-NutanixGuestTools.CMD"
+
+
+# OS Customisation
+      
+#  - name: reg key example
+#    win_regedit:
+#      path: HKLM:\Software\TTLAB
+#      name: hello
+#      data: world
+      
+#  - name: dword reg key example
+#    win_regedit:
+#      path: HKLM:\Software\TTLAB
+#      name: hellod
+#      data: 1
+#      type: dword
+
+#  - name: Run a multiple powershell commands
+#    win_shell: |
+#      New-Item -Path C:\temp -ItemType Directory
+#      New-Item -Path C:\temp\ansible -ItemType Directory
+#      write-host hello-mate >> c:\temp\ansible\test.txt
+
+#  - name: Run a command under cmd
+#    win_shell: echo ansible test >> C:\temp\test.txt && echo still here >> c:\temp\test.txt
+#    args:
+#      executable: cmd.exe
+
+
+# Install Citrix components
+
+  - name: Run Install Citrix VDA
+    win_shell: cmd /c "$env:appinstall\Citrix XenDesktop 1912 LTSR\Install-XenDesktopVDA-ServerMaster.cmd"    
+    args:
+      creates: C:\Program Files\Citrix\Virtual Desktop Agent\BrokerAgent.exe
+      
+  - name: Reboot post VDA installation
+    win_reboot:
+
+  - name: Run Install Workspace App
+    win_shell: cmd /c "$env:appinstall\Citrix_Workspace_App\install-CitrixWorkspaceApp.cmd"    
+    args:
+      creates: C:\Program Files (x86)\Citrix\ICA Client\wfcrun32.exe
+
+  - name: Run Citrix Optimiser script
+    win_shell: cmd /c "$env:appinstall\Script Citrix Optimizer\citrixoptimizer.cmd"    
+
+      
+# Install applications
+
+  - name: Include applications playbook
+    include: coreapplicationset.yaml
+
