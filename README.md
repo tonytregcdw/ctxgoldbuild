@@ -2,7 +2,7 @@
 
 ## Environment
 
-- Windows 10 device running a local Ubuntu Windows Subsystem for Linux (WSL): Used to run ansible and terraform scripts
+- Linux device or Windows 10 or 2019 device running a local Ubuntu Windows Subsystem for Linux (WSL): Used to run ansible and terraform scripts
   - WSL can be deployed inside a Win10 or WS2019 management VM hosted on the customer network.  No need for any dedicated infrastructure or licenses to run ansible.
 
 - All windows devices managed remotely using WINRM via https.
@@ -13,7 +13,7 @@
   - Windows session hosts will be joined to an existing active directory domain
 
 - Session Host terraform provisioning.
-  - WS 2019 servers and win10 workstations deployed into azure
+  - WS 2019 servers and win10 workstations deployed into azure, AWS or vmware esx
   - Virtual network and peering created so newly provisioned servers can see existing infrastructure
   - Public IPs presented and opened up for:
     - RDP(tcp3389)
@@ -94,16 +94,16 @@ ansible -p win_ping target
 
 ## run the playbooks.
 
-### Windows Server 2019 Gold Build
+### Citrix Infrastructure server build
 ```
-ansible-playbook ws2019goldbuild.yaml -i azterraform/inventory.yaml
+ansible-playbook ctxserverbuild.yaml -i ctxinventory.yaml
 ```
-### Windows 10 VDA Gold Build
+### Citrix Session host VDA Gold Build
 ```
-ansible-playbook w10goldbuild.yaml -i azterraform/inventory.yaml
+ansible-playbook ctxappgoldbuild.yaml -i ctxinventory.yaml
 ```
 ### Gather available WINRM data from inventory
 ```
-ansible-playbook gatherfacts.yaml -i azterraform/inventory.yaml
+ansible-playbook gatherfacts.yaml -i ctxinventory.yaml
 ```
   
