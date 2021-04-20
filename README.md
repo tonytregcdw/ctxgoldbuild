@@ -90,11 +90,7 @@ Enable-WSManCredSSP -Role Server -Force
 ```
 ansible -p win_ping target
 ```  
-## Terraform provisioning
 
-```
-terraform apply
-```
 
 ## run the playbooks.
 
