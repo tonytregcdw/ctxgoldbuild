@@ -42,6 +42,7 @@
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
 #obtain ubuntu distro
 curl.exe -L -o ubuntu-1804.appx https://aka.ms/wsl-ubuntu-1804
+#newer version https://wsldownload.azureedge.net/Ubuntu_2004.2020.424.0_x64.appx
 Rename-Item ubuntu-1804.appx ubuntu-1804.zip
 Expand-Archive ubuntu-1804.zip ubuntu1804
 #install
