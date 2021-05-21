@@ -1,6 +1,6 @@
 ---
 - name: grab vm info
-  hosts: vsphere1
+  hosts: vsphere
   gather_facts: no
   vars_prompt:
     - name: vmname
