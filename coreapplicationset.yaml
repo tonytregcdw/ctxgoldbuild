@@ -13,14 +13,25 @@
 - name: Google Chrome
   win_shell: cmd /c "$env:appinstall\Google Chrome Enterprise\install-GoogleChrome.CMD"
   ignore_errors: yes
-
+  args:
+    creates: C:\Program Files\Google\Chrome\Application\chrome.exe
+  
 - name: Adobe Reader
   win_shell: cmd /c "$env:appinstall\Adobe Reader DC\install-AdobeReaderDC.CMD"
   ignore_errors: yes
+  args:
+    creates: C:\Program Files (x86)\Adobe\Acrobat Reader DC\Reader\AcroRd32.exe
   
-#- name: Install notepad-plus-plus
-#  win_package:
-#    path: https://notepad-plus-plus.org/repository/7.x/7.0/npp.7.Installer.x64.exe
-#    product_id: Notepad++
-#    arguments: /S
-#    state: present
+- name: enable windows photo viewer
+  win_shell: cmd /c "$env:appinstall\Microsoft Photo Viewer\install-microsoftphotoviewer.cmd"
+
+- name: Onedrive
+  win_shell: cmd /c "$env:appinstall\Microsoft onedrive\install-onedrive.CMD"
+  become: yes
+  args:
+    creates: C:\Program Files (x86)\Microsoft OneDrive\OneDrive.exe
+  
+- name: Install notepad-plus-plus
+  win_shell: cmd /c "$env:appinstall\Notepad++ 7.x\Install-Notepad.cmd"
+  args:
+    creates: C:\Program Files\Notepad++\notepad++.exe

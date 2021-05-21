@@ -1,0 +1,24 @@
+---
+- name: grab vm info
+  hosts: vsphere1
+  gather_facts: no
+  vars_prompt:
+    - name: vmname
+      prompt: What is the name of the VM (case sensitive)?
+      private: no
+ 
+  tasks:
+  - name: Gather some info from a guest using the vSphere API output schema
+    vmware_guest_info:
+      hostname: "{{ ansible_host }}"
+      username: "{{ esxusername }}"
+      password: "{{ esxpassword }}"
+      validate_certs: no
+      datacenter: "{{ esxdatacenter }}"
+      name: "{{ vmname }}"
+      schema: "vsphere"
+      properties: ["guest.ipAddress","config.name"]
+    delegate_to: localhost
+    register: info
+  - name: display output
+    debug: var=info

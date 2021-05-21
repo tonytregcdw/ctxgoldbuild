@@ -1,0 +1,23 @@
+
+
+PLAYS:
+
+
+deploy ws2016:
+
+VM template:
+ansible-playbook ctxws2016deployvm.yaml -i ctxinventory.yaml
+
+#Update ctxinventoy.yaml with IP
+Gold build:
+ansible-playbook ctxappgoldbuildws2016.yaml -i ctxinventory.yaml
+
+
+deploy ws2019:
+
+template:
+ansible-playbook ctxws2019deployvm.yaml -i ctxinventory.yaml
+
+#Update ctxinventoy.yaml with IP
+Gold build:
+ansible-playbook ctxappgoldbuildws2019.yaml -i ctxinventory.yaml

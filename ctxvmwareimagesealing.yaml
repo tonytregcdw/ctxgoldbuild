@@ -1,0 +1,58 @@
+---
+
+- hosts: vsphere
+  gather_facts: false
+  vars_prompt:
+    - name: vmname
+      prompt: What is the name of the VM to be updated and sealed? - VMM name must match hostname. format RBS-CTXAPP##
+      private: no
+  tasks:
+    - add_host:
+        name: "{{ vmname }}"
+        groups: dynamically_created_hosts
+    - name: Power On
+      delegate_to: localhost
+      vmware_guest:
+        hostname: "{{ ansible_host }}"
+        username: "{{ esxusername }}"
+        password: "{{ esxpassword }}"
+        validate_certs: False
+        name: "{{ vmname }}"
+        datacenter: "{{ esxdatacenter }} "
+        state: poweredon
+        cluster: "{ esxcluster }" 
+#    - name: pause for 30 seconds
+#      pause:
+#        seconds: 30
+#update the image
+
+- hosts: dynamically_created_hosts
+  gather_facts: false
+  vars:
+    ansible_connection: winrm
+    ansible_winrm_server_cert_validation: ignore
+
+  tasks:
+
+  - name: run sealing script
+    win_shell: cmd /c "c:\masters\scripts\script-xendesktop-gold-image-sealing.cmd"
+    
+
+
+#power down, snapshot
+- hosts: vsphere
+  gather_facts: false
+
+
+  tasks:
+    - name: Shutdown Guest OS
+      delegate_to: localhost
+      vmware_guest:
+        hostname: "{{ ansible_host }}"
+        username: "{{ esxusername }}"
+        password: "{{ esxpassword }}"
+        validate_certs: False
+        name: "{{ vmname }}"
+        datacenter: "{{ esxdatacenter }} "
+        state: shutdownguest
+        cluster: "{ esxcluster }"

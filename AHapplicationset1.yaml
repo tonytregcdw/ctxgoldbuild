@@ -1,0 +1,5 @@
+
+- name: Imprivate agent
+  win_shell: cmd /c "$env:appinstall\Imprivata\install-imprivata_Agent_X64.cmd""
+  args:
+    creates: "C:\Program Files (x86)\Imprivata\OneSign Agent\x64\SSOManHost.exe"

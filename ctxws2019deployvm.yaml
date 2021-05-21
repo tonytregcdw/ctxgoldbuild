@@ -1,0 +1,40 @@
+---
+- name: Create a VM from a template
+  hosts: vsphere1
+  gather_facts: no
+  vars_prompt:
+    - name: vmname
+      prompt: What is the name of the VM to be deployed - format RBS-CTXAPP##
+      private: no
+      
+  tasks:
+  - name: Clone the template
+    delegate_to: localhost
+    vmware_guest:
+      hostname: "{{ ansible_host }}"
+      username: "{{ esxusername }}"
+      password: "{{ esxpassword }}"
+      validate_certs: False
+      name: "{{ vmname }}"
+      template: RBS-WS19BASE
+      datastore: "{{ esxdatastore }}"
+      datacenter: "{{ esxdatacenter }}"
+      folder: "{{ esxfolder }}"
+#      state: poweredoff
+      cluster: "{{ esxcluster }}"
+      customization_spec: RBS-WSBASE
+      wait_for_customization: yes
+  - name: retrieve IP of guest using the vSphere API output schema
+    vmware_guest_info:
+      hostname: "{{ ansible_host }}"
+      username: "{{ esxusername }}"
+      password: "{{ esxpassword }}"
+      validate_certs: no
+      datacenter: "{{ esxdatacenter }}"
+      name: "{{ vmname }}"
+      schema: "vsphere"
+      properties: ["guest.ipAddress","config.name"]
+    delegate_to: localhost
+    register: info
+  - name: display output
+    debug: var=info

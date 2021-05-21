@@ -1,21 +1,45 @@
 ---
 ctxws2019:
   children:
-      ctxapp:
+      ctxappws2019:
           hosts:
-            ctxapp01:
-              ansible_host: 51.11.7.131
+            ctxappws1901:
+              ansible_host: 172.16.10.103
       ctxinfra:
         children:
           ctxsf:
               hosts:
                 ctxsf01:
-                  ansible_host: 51.11.7.131
-#          ctxddc:
-#              hosts:
-#                ctxddc01:
-#                  ansible_host: 51.11.7.132         
-ctxadc:
+                  ansible_host: 10.17.63.133
+                ctxsf02:
+                  ansible_host: 10.17.63.134       
+          ctxddc:
+              hosts:
+                ctxddc01:
+                  ansible_host: 10.17.63.131
+                ctxddc02:
+                  ansible_host: 10.17.63.132
+          ctxdhcp:
+              hosts:
+                ctxdhcp01:
+                  ansible_host: 172.16.10.20
+                ctxdhcp02:
+                  ansible_host: 172.16.10.21                 
+ctxws2016:
+  children:
+      ctxappws2016:
+          hosts:
+            ctxappws1601:
+              ansible_host: 172.16.10.100
+#ctxadc:
+#  hosts:
+#    ctxadc01:
+#      ansible_host: 192.168.24.8
+vsphere:
   hosts:
-    ctxadc01:
-      ansible_host: 192.168.24.80
+    vsphere01:
+      ansible_host: rbs-vcenter.xalderhey.com
+vsphere1:
+  hosts:
+    vsphere01:
+      ansible_host: rbs-vxvc01.xalderhey.com

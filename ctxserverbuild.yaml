@@ -27,7 +27,23 @@
 
   - win_reboot:
     when: domain_state.reboot_required
-   
+
+# Apply Windows hotfixes
+
+  - name: Install Windows hotfixes
+    win_shell: cmd /c "$env:appinstall\Microsoft Important Hotfixes\Install-Win2019.cmd"
+
+  - name: Reboot post hotfix
+    win_reboot:
+
+#enable RDP
+
+  - name: enable RDP
+    win_shell: |
+      Set-ItemProperty -Path "HKLM:\System\CurrentControlSet\Control\Terminal Server" -Name "fDenyTSConnections" –Value 0
+      Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+    
+# admin tools    
   - name: install admin tools
     win_feature:
       name: RSAT-Role-Tools
