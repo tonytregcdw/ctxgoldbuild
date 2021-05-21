@@ -1,0 +1,8 @@
+---
+esxhostname: vcenter.ttlab.local
+esxusername: vmwareadmin@ttlab.local
+esxpassword: password
+esxdatacenter: Datacenter
+esxcluster: Citrix
+esxfolder: /Citrix/WS2019RDS
+esxdatastore: DS_CITRIX
