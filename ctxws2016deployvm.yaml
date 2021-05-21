@@ -1,4 +1,7 @@
 ---
+# this playbook requires a VM template and configuration to be present within vsphere.
+# it will prompt for the computer, then deploy from the template.  it will then power up, and deploy the configuration.
+# It will then report back on the IP address of the newly provisioned VM, ready for updating the inventory file for further configuration of the OS.
 - name: Create a VM from a template
   hosts: vsphere
   gather_facts: no
