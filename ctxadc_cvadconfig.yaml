@@ -18,7 +18,7 @@
         nitro_pass: "{{ nitro_pass }}"
         validate_certs: no
         state: present
-        monitorname: mon_ldaps.xalderhey.com
+        monitorname: mon_ldaps
         type: LDAP
         interval: 15
         resptimeout: 5
@@ -38,7 +38,7 @@
 
         state: present
 
-        servicegroupname: svcgrp_ldaps.xalderhey.com_636
+        servicegroupname: svcgrp_ldap_636
         servicetype: TCP
         servicemembers:
             mode: exact
@@ -51,7 +51,7 @@
         monitor_bindings:
             mode: exact
             attributes:
-              - monitor_name: mon_ldaps.xalderhey.com
+              - monitor_name: mon_ldaps
 
 
     - name: Create vserver
@@ -64,79 +64,14 @@
 
         state: present
 
-        name: vsrv_ldaps.xalderhey.com_636
+        name: vsrv_ldaps_636
         servicetype: TCP
         persistencetype: SOURCEIP
         timeout: 12
         ipv46: "{{ ldapvs_ip }}"
         port: 636
         servicegroupbindings:
-            - servicegroupname: svcgrp_ldaps.xalderhey.com_636
-
-# AH ldaps service  
-    - name: setup ldaps monitor
-      delegate_to: localhost
-      citrix_adc_lb_monitor:
-        nsip: "{{ ansible_host }}"
-        nitro_user: "{{ nitro_user }}"
-        nitro_pass: "{{ nitro_pass }}"
-        validate_certs: no
-        state: present
-        monitorname: mon_ldaps.xctc.ctc.nhs.uk
-        type: LDAP
-        interval: 15
-        resptimeout: 5
-        filter: cn=Builtin
-        basedn: "{{ ldaps2_basedn }}"
-        binddn: "{{ ldaps2_binddn }}"
-        password: "{{ ldaps2_bindpass }}"
-        secure: yes
-        
-    - name: Setup ldaps service group
-      delegate_to: localhost
-      citrix_adc_servicegroup:
-        nsip: "{{ ansible_host }}"
-        nitro_user: "{{ nitro_user }}"
-        nitro_pass: "{{ nitro_pass }}"
-        validate_certs: no
-
-        state: present
-
-        servicegroupname: svcgrp_ldaps.xctc.ctc.nhs.uk_636
-        servicetype: TCP
-        servicemembers:
-            mode: exact
-            attributes:
-              - ip: "{{ ldap2_svc1_ip }}"
-                port: 636
-              - ip: "{{ ldap2_svc2_ip }}"
-                port: 636
-
-        monitor_bindings:
-            mode: exact
-            attributes:
-              - monitor_name: mon_ldaps.xctc.ctc.nhs.uk
-
-
-    - name: Create vserver
-      delegate_to: localhost
-      citrix_adc_lb_vserver:
-        nsip: "{{ ansible_host }}"
-        nitro_user: "{{ nitro_user }}"
-        nitro_pass: "{{ nitro_pass }}"
-        validate_certs: no
-
-        state: present
-
-        name: vsrv_ldaps.xctc.ctc.nhs.uk_636
-        servicetype: TCP
-        persistencetype: SOURCEIP
-        timeout: 12
-        ipv46: "{{ ldap2vs_ip }}"
-        port: 636
-        servicegroupbindings:
-            - servicegroupname: svcgrp_ldaps.xctc.ctc.nhs.uk_636
-
+            - servicegroupname: svcgrp_ldaps_636
             
 # storefront service  
     - name: setup storefront monitor
