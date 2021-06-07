@@ -1,15 +1,17 @@
----
+- hosts: localhost
+  vars_prompt:
+    - name: vmname
+      prompt: Please run with name of vm to be generated - eg ansible-playbook ctximagesealing.yaml -i ctxinventory.yaml -e vmname=rbs-ctxapp13 -vvv
+      private: no
+  tasks:
+    - name: Add host to group ctxappws2019
+      add_host:
+        name: "{{ vmname }}"
+        groups: ctxappws2019
 
 - hosts: vsphere
   gather_facts: false
-  vars_prompt:
-    - name: vmname
-      prompt: What is the name of the VM to be updated and sealed? - VMM name must match hostname. format RBS-CTXAPP##
-      private: no
   tasks:
-    - add_host:
-        name: "{{ vmname }}"
-        groups: ctxappws2019
     - name: Power On
       delegate_to: localhost
       vmware_guest:
@@ -19,11 +21,10 @@
         validate_certs: False
         name: "{{ vmname }}"
         datacenter: "{{ esxdatacenter }} "
+        folder: "{{ esxfolder }}"
         state: poweredon
-        cluster: "{ esxcluster }" 
-#    - name: pause for 30 seconds
-#      pause:
-#        seconds: 30
+        cluster: "{{ esxcluster }}" 
+
 #update the image
 
 - hosts: ctxappws2019
@@ -33,16 +34,18 @@
     ansible_winrm_server_cert_validation: ignore
 
   tasks:
-
+  - name: Wait 30 seconds, but only start checking after 10 seconds
+    wait_for_connection:
+      delay: 10
+      timeout: 30
   - name: run sealing script
     win_shell: cmd /c "c:\masters\scripts\script-xendesktop-gold-image-sealing.cmd"
+    ignore_errors: yes
     
-
 
 #power down, snapshot
 - hosts: vsphere
   gather_facts: false
-
 
   tasks:
     - name: Shutdown Guest OS
@@ -55,4 +58,4 @@
         name: "{{ vmname }}"
         datacenter: "{{ esxdatacenter }} "
         state: shutdownguest
-        cluster: "{ esxcluster }"
+        cluster: "{{ esxcluster }}"
