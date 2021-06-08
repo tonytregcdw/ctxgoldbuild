@@ -38,8 +38,5 @@ ctxws2016:
 vsphere:
   hosts:
     vsphere01:
-      ansible_host: rbs-vcenter.xalderhey.com
-vsphere1:
-  hosts:
-    vsphere01:
-      ansible_host: rbs-vxvc01.xalderhey.com
+      ansible_host: vcenter.ttlab.local
+
